@@ -1,0 +1,12 @@
+(tls-config) {
+    tls {
+        on_demand
+    }
+}
+
+{{ root_host }} {
+    file_server
+    root * /usr/share/caddy
+}
+
+import {{ caddy_dir }}/vhosts/*

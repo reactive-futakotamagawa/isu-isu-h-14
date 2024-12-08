@@ -1,0 +1,23 @@
+- name: "Pull"
+  ansible.builtin.git:
+    repo: "{{ github.repo_url }}"
+    dest: "{{ project_root }}"
+    version: "{{ deploy_branch }}"
+    force: true
+
+- name: "Get last commit"
+  ansible.builtin.command:
+    cmd: "git log --pretty=oneline -n 1"
+    chdir: "{{ project_root }}"
+  register: last_commit
+  changed_when: false
+
+- name: "Send last commit"
+  ansible.builtin.uri:
+    url: "{{ webhook_url }}"
+    method: POST
+    body_format: json
+    body: '{"content": "**Deploying...**:\nbranch: `{{ deploy_branch }}`\ncommit: `{{ last_commit.stdout }}`"}'
+    status_code:
+      - 204
+  changed_when: false

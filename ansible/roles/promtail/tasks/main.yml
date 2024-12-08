@@ -1,0 +1,28 @@
+- name: Add Grafana gpg key
+  ansible.builtin.get_url:
+    url: https://apt.grafana.com/gpg.key
+    dest: /etc/apt/keyrings/grafana.asc
+    mode: "0644"
+    force: true
+  become: true
+
+- name: Add docker apt repository
+  ansible.builtin.apt_repository:
+    repo: deb [arch=amd64 signed-by=/etc/apt/keyrings/grafana.asc] https://apt.grafana.com stable main
+    state: present
+  become: true
+
+- name: "Download promtail"
+  ansible.builtin.apt:
+    name: "promtail"
+    state: present
+    force_apt_get: true
+  become: true
+
+- name: "Set promtail config"
+  ansible.builtin.template:
+    src: "config.yml.j2"
+    dest: "/etc/promtail/config.yml"
+    mode: "0644"
+  notify: Restart_promtail # TODO: Add handler
+  become: true

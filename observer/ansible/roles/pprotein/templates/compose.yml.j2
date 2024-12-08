@@ -1,0 +1,25 @@
+services:
+  pprotein:
+    image: {{ pprotein.image }}
+    ports:
+      - "9000:9000"
+    volumes:
+      - pprotein:/opt/pprotein/data
+    environment:
+      - GRAFANA_URL=http://localhost:{{ grafana.port }}
+      - GRAFANA_TOKEN={{ grafana.token }}
+      - DB_TYPE=mysql
+
+  #ポートフォワーディング用のコンテナ
+  {% for server in servers %}
+{{ server.id }}:
+    image: ghcr.io/reactive-futakotamagawa/isu-isu-h/tunnel:latest
+    volumes:
+      - {{ pprotein.dir }}/tunnel/config:/etc/ssh/ssh_config:ro
+      - {{ pprotein.dir }}/tunnel/.ssh:/root/.ssh/:ro
+    command: -N {{ server.id }}
+    restart: always
+  {% endfor %}
+
+volumes:
+  pprotein:

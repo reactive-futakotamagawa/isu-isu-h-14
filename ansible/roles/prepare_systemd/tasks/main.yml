@@ -1,0 +1,15 @@
+- name: Copy configs
+  ansible.builtin.copy:
+    remote_src: true
+    src: "{{ systemd.conf_dir.original }}/"
+    dest: "{{ systemd.conf_dir.repo }}"
+    mode: "777"
+    directory_mode: "777"
+  become: true
+
+- name: Change permission of copied config files
+  ansible.builtin.file:
+    path: "{{ systemd.conf_dir.repo }}"
+    recurse: true
+    owner: isucon
+  become: true

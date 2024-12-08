@@ -1,0 +1,31 @@
+- name: "Copy config files"
+  ansible.builtin.copy:
+    remote_src: true
+    src: "{{ item.value.repo }}/"
+    dest: "{{ item.value.original }}"
+    mode: "755"
+  loop: "{{ services | dict2items }}"
+  become: true
+  notify: "Restart {{ item.value.service_name }}"
+
+- name: "Truncate log file"
+  ansible.builtin.shell:
+    cmd: "touch {{ item.value.log }} && truncate -s 0 -c {{ item.value.log }}"
+  loop: "{{ services | dict2items }}"
+  become: true
+  changed_when: false
+  when: item.value.log is defined
+
+- name: "Change log file permission"
+  ansible.builtin.file:
+    path: "{{ item.value.log }}"
+    mode: "777"
+  loop: "{{ services | dict2items }}"
+  become: true
+  when: item.value.log is defined
+
+- name: "Restart"
+  ansible.builtin.systemd:
+    name: "isuride-matcher.service"
+    state: restarted
+  become: true

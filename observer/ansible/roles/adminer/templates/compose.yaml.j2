@@ -1,0 +1,16 @@
+services:
+  adminer:
+    image: adminer:latest
+    ports:
+      - "{{ adminer.port }}:8080"
+  
+  #ポートフォワーディング用のコンテナ
+  {% for server in servers %}
+{{ server.id }}:
+    image: ghcr.io/reactive-futakotamagawa/isu-isu-h/tunnel:latest
+    volumes:
+      - /srv/adminer/tunnel/config:/etc/ssh/ssh_config:ro
+      - /srv/adminer/tunnel/.ssh:/root/.ssh/:ro
+    command: -N {{ server.id }}
+    restart: always
+  {% endfor %}

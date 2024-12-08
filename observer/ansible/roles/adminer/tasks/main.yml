@@ -1,0 +1,33 @@
+- name: "Create directory"
+  ansible.builtin.file:
+    path: "/srv/adminer"
+    state: directory
+    mode: "0755"
+  become: true
+
+- name: "Copy tunnel files"
+  ansible.builtin.import_role:
+    name: "tunnel"
+    tasks_from: "main.yml"
+  vars:
+    tunnel_dst: "/srv/adminer"
+
+- name: "Set compose.yml"
+  ansible.builtin.template:
+    src: "compose.yaml.j2"
+    dest: "/srv/adminer/compose.yaml"
+    mode: "0644"
+  become: true
+
+- name: "Docker run adminer"
+  community.docker.docker_compose_v2:
+    project_src: "/srv/adminer"
+    state: "present"
+
+- name: "Set Caddyfile"
+  ansible.builtin.template:
+    src: "Caddyfile.j2"
+    dest: "{{ caddy_dir }}/vhosts/caddy_adminer"
+    mode: "0644"
+  become: true
+  notify: Restart_caddy

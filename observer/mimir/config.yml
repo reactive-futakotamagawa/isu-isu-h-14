@@ -1,0 +1,28 @@
+# Do not use this configuration in production.
+# It is for demonstration purposes only.
+# Run Mimir in single process mode, with all components running in 1 process.
+target: all,alertmanager,overrides-exporter
+
+# Configure Mimir to use Minio as object storage backend.
+common:
+  storage:
+    backend: s3
+    s3:
+      endpoint: minio:9000
+      access_key_id: minio
+      secret_access_key: minio123
+      insecure: true
+      bucket_name: mimir
+
+# Blocks storage requires a prefix when using a common object storage bucket.
+blocks_storage:
+  storage_prefix: blocks
+  tsdb:
+    dir: /data/ingester
+
+memberlist:
+  join_members: [mimir, mimir2, mimir3]
+
+server:
+  http_listen_port: 9009
+  log_level: warn

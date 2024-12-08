@@ -1,0 +1,38 @@
+name: release
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+
+jobs:
+  release_tools:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    strategy:
+      matrix:
+        tools:
+          - intro-h
+          - n1-h
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: ./tools/${{ matrix.tools }}/go.mod
+
+      - name: goreleaser
+        uses: goreleaser/goreleaser-action@v4
+        with:
+          version: v2.2.0
+          args: release --clean
+          workdir: ./tools/${{ matrix.tools }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

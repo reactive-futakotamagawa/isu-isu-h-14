@@ -1,0 +1,6 @@
+- name: "Download profiling"
+  ansible.builtin.get_url:
+    url: "{{ pprotein_url }}/api/pprof/data/latest?label={{ server_id }}"
+    dest: "{{ app.dir }}/default.pgo"
+    mode: "0644"
+    force: true

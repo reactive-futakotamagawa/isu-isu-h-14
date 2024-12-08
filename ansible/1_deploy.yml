@@ -1,0 +1,9 @@
+- name: "Deploy"
+  hosts: all
+  remote_user: isucon
+  roles:
+    - git
+    - systemd
+    - services
+    # - pgo # ビルドに時間がかかるので、デフォルトは切っておく
+    - app

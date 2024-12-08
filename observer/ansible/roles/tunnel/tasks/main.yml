@@ -1,0 +1,31 @@
+- name: Create tunnel directory
+  ansible.builtin.file:
+    path: "{{ tunnel_dst }}/tunnel"
+    state: directory
+    mode: "0755"
+  become: true
+
+- name: Create tunnel .ssh directory
+  ansible.builtin.file:
+    path: "{{ tunnel_dst }}/tunnel/.ssh"
+    state: directory
+    mode: "0755"
+  become: true
+
+- name: Copy template tunnel files
+  ansible.builtin.template:
+    src: "{{ item }}.j2"
+    dest: "{{ tunnel_dst }}/tunnel/{{ item }}"
+    mode: "0644"
+  loop:
+    - "config"
+  become: true
+
+- name: Copy tunnel files
+  ansible.builtin.copy:
+    src: "{{ item }}"
+    dest: "{{ tunnel_dst }}/tunnel/{{ item }}"
+    mode: "0600"
+  loop:
+    - .ssh/id_ed25519
+  become: true

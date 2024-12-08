@@ -1,0 +1,16 @@
+- name: "Move env file"
+  ansible.builtin.command:
+    cmd: "mv {{ env_file.original }} {{ env_file.repo }}"
+    creates: "{{ env_file.repo }}"
+
+- name: "Symlink env file"
+  ansible.builtin.file:
+    src: "{{ env_file.repo }}"
+    dest: "{{ env_file.original }}"
+    state: link
+
+- name: "Add env var for pprotein"
+  ansible.builtin.lineinfile:
+    path: "{{ env_file.repo }}"
+    state: present
+    line: "PPROTEIN_GIT_REPOSITORY={{ project_root }}"

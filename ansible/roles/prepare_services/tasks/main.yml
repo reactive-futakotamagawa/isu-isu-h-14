@@ -1,0 +1,35 @@
+- name: Copy configs
+  ansible.builtin.copy:
+    remote_src: true
+    src: "{{ item.value.original }}/"
+    dest: "{{ item.value.repo }}"
+    mode: "777"
+    directory_mode: "777"
+  loop: "{{ services | dict2items }}"
+  become: true
+
+- name: Change permission of copied config files
+  ansible.builtin.file:
+    path: "{{ item.value.repo }}"
+    recurse: true
+    owner: isucon
+  loop: "{{ services | dict2items }}"
+  become: true
+
+- name: "Create log file"
+  ansible.builtin.file:
+    path: "{{ item.value.log }}"
+    state: touch
+    mode: "777"
+  loop: "{{ services | dict2items }}"
+  become: true
+  when: item.value.log is defined
+
+- name: "Change permissoin of log file"
+  ansible.builtin.file:
+    path: "{{ item.value.log | dirname }}"
+    recurse: true
+    mode: "777"
+  loop: "{{ services | dict2items }}"
+  become: true
+  when: item.value.log is defined

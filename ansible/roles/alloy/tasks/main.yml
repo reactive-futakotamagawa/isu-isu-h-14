@@ -1,0 +1,15 @@
+# https://github.com/grafana/grafana-ansible-collection/tree/main/roles/alloy
+- name: Set alloy config
+  become: true
+  ansible.builtin.template:
+    src: "config.alloy.j2"
+    dest: "/etc/alloy/config.alloy"
+    mode: "0644"
+  notify: Restart_alloy
+
+- name: Start alloy
+  ansible.builtin.systemd:
+    name: alloy
+    state: started
+    enabled: true
+  become: true

@@ -1,0 +1,23 @@
+- name: "Check CPU"
+  ansible.builtin.command: "set -o pipefail && lscpu | grep -e Architecture -e '^CPU(s)' | grep '^[^N]' | tr -s ' ' '`' | tr '\n' '#' | sed -e 's/#/`, /g'"
+  register: cpu_info
+  changed_when: false
+  ignore_errors: true
+  failed_when: false
+
+- name: "Check memory"
+  ansible.builtin.shell:
+    cmd: "set -o pipefail && cat /proc/meminfo | grep MemTotal"
+    executable: /bin/bash
+  register: memory_info
+  changed_when: false
+
+- name: "Send result"
+  ansible.builtin.uri:
+    url: "{{ webhook_url }}"
+    method: POST
+    body_format: json
+    body: '{"content": "**{{ server_id }}**:\n **CPU**: {{ cpu_info.stdout }}\n **Mem**: {{ memory_info.stdout }}"}'
+    status_code:
+      - 204
+  changed_when: false

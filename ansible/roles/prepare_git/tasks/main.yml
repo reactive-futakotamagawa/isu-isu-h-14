@@ -1,0 +1,44 @@
+- name: "Generate ssh key"
+  ansible.builtin.shell:
+    cmd: |
+      ssh-keygen -t ed25519 -f /home/isucon/.ssh/id_ed25519 -N ""
+    creates: /home/isucon/.ssh/id_ed25519
+
+- name: "Cat Publickey"
+  ansible.builtin.command: cat /home/isucon/.ssh/id_ed25519.pub
+  register: ssh_pubkey
+  changed_when: false
+
+- name: "Set git config name"
+  community.general.git_config:
+    name: "user.name"
+    value: "isucon_{{ server_id }}"
+  become: true
+
+- name: "Set git config email"
+  community.general.git_config:
+    name: "user.email"
+    value: "isucon_{{ server_id }}@isucon.local"
+  become: true
+
+- name: "Set GitHub key"
+  community.general.github_deploy_key:
+    owner: "{{ github.repo_owner }}"
+    repo: "{{ github.repo_name }}"
+    name: "isucon_{{ server_id }}"
+    key: "{{ ssh_pubkey.stdout }}"
+    token: "{{ github.token }}"
+    read_only: false
+
+- name: "Git init"
+  ansible.builtin.shell:
+    cmd: "cd {{ project_root }} && git init && git remote add origin {{ github.repo_url }} "
+    creates: "{{ project_root }}/.git"
+
+- name: "Pull"
+  ansible.builtin.git:
+    repo: "{{ github.repo_url }}"
+    dest: "{{ project_root }}"
+    accept_newhostkey: true
+    force: true
+    version: "{{ deploy_branch }}"

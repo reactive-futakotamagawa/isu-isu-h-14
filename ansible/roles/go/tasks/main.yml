@@ -1,0 +1,24 @@
+- name: "Download go"
+  ansible.builtin.get_url:
+    url: "https://golang.org/dl/go{{ go.version }}.linux-amd64.tar.gz"
+    dest: "/tmp/{{ go.version }}.linux-amd64.tar.gz"
+    mode: "0644"
+
+- name: "Remove existing go"
+  ansible.builtin.file:
+    path: "{{ go.dir }}"
+    state: absent
+    recurse: true
+
+- name: "Extract go"
+  ansible.builtin.unarchive:
+    src: "/tmp/{{ go.version }}.linux-amd64.tar.gz"
+    dest: "{{ go.dir }}"
+    remote_src: true
+
+- name: "Set go path"
+  ansible.builtin.lineinfile:
+    dest: "/home/isucon/.profile"
+    insertafter: EOF
+    line: "export PATH=$PATH:{{ go.dir }}/bin"
+    state: present

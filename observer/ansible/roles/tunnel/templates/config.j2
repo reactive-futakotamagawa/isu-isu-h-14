@@ -1,0 +1,15 @@
+Host *
+	TCPKeepAlive yes
+	ServerAliveInterval 60
+	StrictHostKeyChecking no
+	UserKnownHostsFile /dev/null
+	User isucon
+	LocalForward 0:3306 0:3306
+	LocalForward 0:8888 0:8888
+	LocalForward 0:9100 0:9100
+	LocalForward 0:9558 0:9558
+
+{% for server in servers %}
+Host {{ server.id }}
+	HostName {{ server.address }}
+{% endfor %}

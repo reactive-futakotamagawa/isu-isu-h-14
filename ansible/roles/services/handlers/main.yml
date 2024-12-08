@@ -1,0 +1,20 @@
+- name: "Restart mysql"
+  ansible.builtin.systemd:
+    name: "mysql"
+    state: restarted
+    daemon_reload: true
+  become: true
+
+- name: "Restart nginx"
+  ansible.builtin.systemd:
+    name: "nginx"
+    state: restarted
+    daemon_reload: true
+  become: true
+# 他のサービスを再起動する必要がある場合は、サービス名を変えたやつをここに置く
+# - name: "Restart {サービス名}"
+#   ansible.builtin.systemd:
+#     name: "{サービス名}"
+#     state: restarted
+#     daemon_reload: true
+#   become: true

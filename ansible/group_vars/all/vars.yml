@@ -1,0 +1,78 @@
+---
+## 事前に設定する部分
+# DiscordのWebhook URL
+webhook_url: "discord webhook url"
+
+pprotein_url: "https://p.isu.example.com"
+
+# GitHubの設定
+github:
+  # リポジトリURL(sshの方)
+  repo_url: git@github.com:reactive-futakotamagawa/isucon14.git
+  # リポジトリ名
+  repo_name: isucon14
+
+  # リポジトリのオーナーの名前
+  repo_owner: "reactive-futakotamagawa"
+  # GitHubのトークン(vaultで設定)
+  token: "{{ vault_github.token }}"
+
+# デフォルトのブランチ
+deploy_branch: main
+
+## 当日サーバーに入って設定する部分
+
+# Gitリポジトリのルートディレクトリ
+project_root: /home/isucon
+
+# デプロイごとに再起動したりしたいsystemdのサービス
+services:
+  nginx:
+    # サービス名
+    service_name: nginx
+    # 設定ファイルのディレクトリ
+    original: /etc/nginx
+    # 設定ファイルのコピー先のディレクトリ
+    repo: "{{ project_root }}/{{ server_id }}/etc/nginx"
+    # ログファイルのパス(optional)
+    log: /var/log/nginx/access.log
+  db:
+    service_name: mysql
+    original: /etc/mysql
+    repo: "{{ project_root }}/{{ server_id }}/etc/mysql"
+    log: /var/log/mysql/mysql-slow.log
+
+# アプリの設定
+app:
+  # systemdのサービス名
+  service_name: isuride-go.service
+  # デプロイ先のディレクトリ
+  dir: "{{ project_root }}/webapp/go"
+  # バイナリファイルのパス
+  bin: "{{ project_root }}/webapp/go/isuride"
+
+go:
+  # Goのパス(which go)
+  path: "/home/isucon/local/golang/bin/go"
+
+  # ここから下はGoのインストールに関する設定
+  # Goをインストールするディレクトリ
+  dir: "/home/isucon/local/go"
+  # Goのバージョン
+  version: "1.23.3"
+
+# 環境変数の設定
+env_file:
+  # 元の環境変数ファイル
+  original: /home/isucon/env.sh
+  # リポジトリにコピーする環境変数ファイル
+  repo: "{{ project_root }}/{{ server_id }}/env.sh"
+
+# systemdの設定
+systemd:
+  # systemdの設定ファイルのディレクトリ
+  conf_dir:
+    # 元のディレクトリ
+    original: /etc/systemd/system
+    # リポジトリにコピーするディレクトリ
+    repo: "{{ project_root }}/{{ server_id }}/etc/systemd/system"

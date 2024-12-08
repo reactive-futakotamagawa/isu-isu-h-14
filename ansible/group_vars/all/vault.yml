@@ -1,0 +1,4 @@
+vault_github:
+  # GitHubのpersonal access token
+  # リポジトリにssh鍵を設定する権限が必要
+  token: "GitHub personal access token"

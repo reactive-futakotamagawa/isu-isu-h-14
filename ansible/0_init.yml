@@ -1,0 +1,13 @@
+- name: "Init server"
+  remote_user: isucon
+  hosts: all
+  roles:
+    - apt
+    - prepare_git
+    - alloy
+    - observer
+    - prepare_services
+    - prepare_systemd
+    - env
+    - spec
+    # - go だいたいいらないのでコメントアウト

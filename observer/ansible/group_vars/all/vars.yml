@@ -1,0 +1,92 @@
+# 問題サーバー
+servers:
+  - id: s1 # サーバーID
+    address: IPアドレス # サーバーのIPアドレス
+  - id: s2
+    address: IPアドレス
+  - id: s3
+    address: IPアドレス
+
+# Caddyの設定ファイルのディレクトリ
+caddy_dir: /etc/caddy
+
+# observerが動くサーバーにつながるドメイン
+root_host: isu.example.com
+
+# dockerの設定
+docker:
+  # イメージが置いてあるレジストリ
+  registry: "https://ghcr.io"
+  # ログイン情報
+  username: ikura-hamu
+  password: "{{ vault_docker_password }}"
+
+# adminerの設定
+adminer:
+  # adminerで使いたいホスト
+  host: a.isu.example.com
+  # ホストマシンから使うポート
+  port: 8080
+
+# pproteinの設定
+pprotein:
+  # pproteinのdocker composeが使うディレクトリ
+  dir: /srv/pprotein
+  # 使いたいホスト
+  host: p.isu.example.com
+  # ホストマシンから使うポート
+  port: 9000
+  # pproteinのコンテナイメージ
+  image: "ghcr.io/reactive-futakotamagawa/pprotein:latest"
+
+# monitorの設定
+monitor:
+  # monitorのdocker composeが使うディレクトリ
+  dir: /srv/monitor
+
+# 競技の終了時刻
+# YYYY-MM-DDTHH:MM:SS
+end_datetime: "2024-12-08T18:00:00"
+
+# Grafanaの設定
+grafana:
+  # grafanaで使いたいホスト
+  host: g.isu.example.com
+  # ホストマシンから使うポート
+  port: 3000
+  # grafanaのAPIトークン
+  token: "token"
+
+# Mimirの設定
+mimir:
+  # Mimirで使いたいホスト
+  host: m.isu.example.com
+  # ホストマシンから使うポート
+  port: 8080
+
+# Lokiの設定
+loki:
+  # Lokiで使いたいホスト
+  host: loki.isu.example.com
+  # ホストマシンから使うポート
+  port: 3100
+
+# Mimirのバックエンドとして使うMinioの設定
+minio:
+  # Minioで使いたいホスト
+  port: 9000
+  # Minioのアクセスキーとシークレットキー
+  access_key: minio
+  secret_key: minio123
+
+# Mimirで使うNginxの設定
+nginx:
+  # Nginxで使いたいホスト
+  port: 9009
+
+# Prometheusの設定
+prometheus:
+  # Prometheusで使いたいホスト
+  host: pro.isu.example.com
+  # Prometheusでホストマシンから使いたいホスト
+  port: 9090

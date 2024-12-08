@@ -1,0 +1,11 @@
+- name: "Build"
+  ansible.builtin.command:
+    cmd: "{{ go.path }} build -o {{ app.bin }}"
+    chdir: "{{ app.dir }}"
+  changed_when: false
+
+- name: "Restart app"
+  ansible.builtin.systemd:
+    name: "{{ app.service_name }}"
+    state: restarted
+  become: true

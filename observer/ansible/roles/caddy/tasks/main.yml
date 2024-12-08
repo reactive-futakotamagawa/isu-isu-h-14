@@ -1,0 +1,53 @@
+- name: Ensure dependencies are installed.
+  ansible.builtin.apt:
+    name:
+      - debian-keyring
+      - debian-archive-keyring
+      - apt-transport-https
+      - gnupg2
+      - curl
+    state: present
+
+- name: Add caddy gpg key
+  ansible.builtin.get_url:
+    url: https://dl.cloudsmith.io/public/caddy/stable/gpg.key
+    dest: /etc/apt/keyrings/caddy.asc
+    mode: "0644"
+    force: true
+  become: true
+
+- name: Add apt repository
+  ansible.builtin.apt_repository:
+    repo: deb [arch=amd64 signed-by=/etc/apt/keyrings/caddy.asc] https://dl.cloudsmith.io/public/caddy/stable/deb/debian any-version main
+    state: present
+    update_cache: true
+  become: true
+
+- name: Install caddy
+  ansible.builtin.apt:
+    name:
+      - caddy
+    state: present
+
+- name: Set Caddyfile
+  ansible.builtin.template:
+    src: "Caddyfile.j2"
+    dest: "{{ caddy_dir }}/Caddyfile"
+    mode: "0644"
+  become: true
+  notify: Restart_caddy
+
+- name: "Make caddy vhost directory"
+  ansible.builtin.file:
+    path: "{{ caddy_dir }}/vhosts"
+    state: directory
+    mode: "0755"
+  become: true
+
+- name: "Set top page"
+  ansible.builtin.template:
+    src: "index.html.j2"
+    dest: "/usr/share/caddy/index.html"
+    mode: "0644"
+  become: true
+  notify: Restart_caddy

@@ -1,0 +1,5 @@
+version: v1.62.2
+name: "isu-golangci-lint"
+plugins:
+  - module: "github.com/reactive-futakotamagawa/isu-isu-h/tools/n1-h"
+    path: "."

@@ -1,0 +1,15 @@
+{{ grafana.host }} {
+  reverse_proxy localhost:{{ grafana.port }}
+}
+
+{{ loki.host }} {
+  reverse_proxy localhost:{{ loki.port }}
+}
+
+{{ mimir.host }} {
+  reverse_proxy localhost:{{ nginx.port }}
+}
+
+{{ prometheus.host }} {
+  reverse_proxy localhost:{{ prometheus.port }}
+}

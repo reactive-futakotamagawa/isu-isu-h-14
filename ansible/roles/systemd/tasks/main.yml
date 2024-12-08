@@ -1,0 +1,8 @@
+- name: "Copy config files"
+  ansible.builtin.copy:
+    remote_src: true
+    src: "{{ systemd.conf_dir.repo }}/"
+    dest: "{{ systemd.conf_dir.original }}"
+    mode: "755"
+  become: true
+  notify: "Daemon reload"

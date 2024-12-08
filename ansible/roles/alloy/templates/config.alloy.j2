@@ -1,0 +1,59 @@
+discovery.relabel "journal" {
+        targets = []
+
+        rule {
+                source_labels = ["__journal__systemd_unit"]
+                target_label  = "unit"
+        }
+
+        rule {
+                source_labels = ["__journal__hostname"]
+                target_label  = "server_id"
+                regex         = "(.*)"
+                replacement   = "{{ server_id }}"
+        }
+}
+
+loki.source.journal "scrape" {
+        max_age       = "8h0m0s"
+        relabel_rules = discovery.relabel.journal.rules
+        forward_to    = [loki.write.default.receiver]
+}
+
+loki.write "default" {
+        endpoint {
+                url = "https://loki.isu.example.com/loki/api/v1/push"
+                batch_wait = "3s"
+        }
+}
+
+prometheus.exporter.unix "node" { }
+
+// Configure a prometheus.scrape component to collect unix metrics.
+prometheus.scrape "node_{{ server_id }}" {
+        targets    = prometheus.exporter.unix.node.targets
+        forward_to = [prometheus.relabel.server_id.receiver]
+        scrape_interval = "5s"
+        scrape_timeout  = "3s"
+}
+
+prometheus.relabel "server_id" {
+        forward_to = [prometheus.remote_write.default.receiver]
+
+        rule {
+                action = "replace"
+                source_labels = ["instance"]
+                target_label  = "server_id"
+                regex         = "(.*)"
+                replacement   = "{{ server_id }}"
+        }
+}
+
+prometheus.remote_write "default" {
+        endpoint {
+                url = "https://m.isu.example.com/api/v1/push"
+                headers = {
+                        "X-Scope-OrgID" = "isu-isu-h",
+                }
+        }
+}

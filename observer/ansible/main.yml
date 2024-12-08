@@ -1,0 +1,10 @@
+- name: Main
+  remote_user: root
+  hosts: all
+  roles:
+    - apt
+    - caddy
+    - docker
+    - monitor
+    - adminer
+    - pprotein
